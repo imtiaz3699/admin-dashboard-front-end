@@ -18,8 +18,9 @@ interface InputWithLabelProps {
   success?: boolean;
   error?: boolean;
   hint?: string;
-  errorMessage?:string;
-  required?:boolean;
+  errorMessage?: string;
+  required?: boolean;
+  type:string;
 }
 
 const InputWithLabel: React.FC<InputWithLabelProps> = ({
@@ -40,11 +41,12 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
   hint,
   errorMessage,
   required = false,
+  errors,
 }) => {
   return (
     <div className="w-full">
       <Label htmlFor={id || name}>
-        {label} {required && <span className="text-error-500">*</span>} 
+        {label} {required && <span className="text-error-500">*</span>}
       </Label>
       <Input
         id={id || name}
@@ -63,6 +65,9 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
         hint={hint}
         errorMessage={errorMessage}
       />
+      {errors && (
+        <p className="text-red-500 text-sm">{errors}</p>
+      )}
     </div>
   );
 };

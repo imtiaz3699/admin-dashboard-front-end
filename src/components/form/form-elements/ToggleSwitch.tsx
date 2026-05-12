@@ -19,21 +19,6 @@ export default function ToggleSwitch() {
           onChange={handleSwitchChange}
         />
         <Switch label="Disabled" disabled={true} />
-      </div>{" "}
-      <div className="flex gap-4">
-        <Switch
-          label="Default"
-          defaultChecked={true}
-          onChange={handleSwitchChange}
-          color="gray"
-        />
-        <Switch
-          label="Checked"
-          defaultChecked={true}
-          onChange={handleSwitchChange}
-          color="gray"
-        />
-        <Switch label="Disabled" disabled={true} color="gray" />
       </div>
     </ComponentCard>
   );

@@ -11,9 +11,10 @@ import { Dropdown } from "../../ui/dropdown/Dropdown";
 import { DropdownItem } from "../../ui/dropdown/DropdownItem";
 import { useState } from "react";
 import { MoreDotIcon } from "../../../icons";
-export default function BasicTableOne({ data, handleEdit,handleDelete }: { data: any, handleEdit: any,handleDelete:any }) {
+export default function BasicTableOne({ data, handleEdit, handleDelete }: { data: any, handleEdit: any, handleDelete: any }) {
   const [selectUser, setSelectUser] = useState<string>("fasdf");
   console.log(selectUser,)
+  console.log(data,'fasldfjhalsdjkfhlasjdfhlasdjk')
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
 
@@ -26,25 +27,50 @@ export default function BasicTableOne({ data, handleEdit,handleDelete }: { data:
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
+
                 Name
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Email
+                Barcode
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Team
+                Category
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Role
+                Brand
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Unit
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Cost Price
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Selling Price
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Is Active
               </TableCell>
               <TableCell
                 isHeader
@@ -60,6 +86,9 @@ export default function BasicTableOne({ data, handleEdit,handleDelete }: { data:
             {data?.length > 0 && data?.map((admin: any) => (
               <TableRow key={admin._id}>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  <div className='w-[30px] h-[30px] rounded-full'>
+                    <img src="" />
+                  </div>
                   {admin?.name}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
@@ -80,7 +109,7 @@ export default function BasicTableOne({ data, handleEdit,handleDelete }: { data:
                     <DropdownItem onItemClick={() => { handleEdit(admin); setSelectUser("") }}>
                       <div className='text-gray-'> Edit</div>
                     </DropdownItem>
-                    <DropdownItem onItemClick={()=> {handleDelete(admin?._id);setSelectUser("")}} >
+                    <DropdownItem onItemClick={() => { handleDelete(admin?._id); setSelectUser("") }} >
                       <div>Delete</div>
                     </DropdownItem>
                   </Dropdown>

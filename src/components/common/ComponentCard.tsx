@@ -7,16 +7,24 @@ interface ComponentCardProps {
   className?: string; // Additional custom classes for styling
   desc?: string; // Description text
   addText?: string;
-  handleAddRecord?: () => void
+  brand?: string;
+  category?: string;
+  handleAddRecord?: () => void;
+  handleAddCategory?: () => void;
+  handleAddBrand?: () => void;
 }
 
 const ComponentCard: React.FC<ComponentCardProps> = ({
   title,
+  brand,
+  category,
   children,
   className = "",
   desc = "",
   addText,
-  handleAddRecord
+  handleAddRecord,
+  handleAddBrand,
+  handleAddCategory
 }) => {
   return (
     <div
@@ -34,9 +42,23 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             </p>
           )}
         </div>
-        <div onClick={handleAddRecord} className='flex flex-row items-center gap-2 cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800 px-2 py-1 rounded-[5px]'>
-          <p className='text-base font-medium text-gray-800 dark:text-white/90'>{addText}</p>
-          <PlusIcon />
+        <div className='flex flex-row gap-5'>
+          {
+            category && <div onClick={handleAddCategory} className='flex flex-row items-center gap-2 cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800 px-2 py-1 rounded-[5px]'>
+              <p className='text-base font-medium text-gray-800 dark:text-white/90'>{category}</p>
+              <PlusIcon />
+            </div>
+          }
+          {
+            brand && <div onClick={handleAddBrand} className='flex flex-row items-center gap-2 cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800 px-2 py-1 rounded-[5px]'>
+              <p className='text-base font-medium text-gray-800 dark:text-white/90'>{brand}</p>
+              <PlusIcon />
+            </div>
+          }
+          <div onClick={handleAddRecord} className='flex flex-row items-center gap-2 cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800 px-2 py-1 rounded-[5px]'>
+            <p className='text-base font-medium text-gray-800 dark:text-white/90'>{addText}</p>
+            <PlusIcon />
+          </div>
         </div>
       </div>
       {/* Card Body */}

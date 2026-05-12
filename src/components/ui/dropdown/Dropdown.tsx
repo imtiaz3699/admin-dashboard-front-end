@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 interface DropdownProps {
   isOpen: boolean;
   onClose?: () => void;
+  onClick?: () => void;
   children?: React.ReactNode;
   className?: string;
 }
@@ -13,6 +14,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   onClose,
   children,
   className = "",
+  onClick
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +40,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <div
       ref={dropdownRef}
+      onClick={onClick}
       className={`absolute z-40  right-0 mt-2  rounded-xl border border-gray-200 bg-white  shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
     >
       {children}

@@ -53,13 +53,13 @@ export const Modal: React.FC<ModalProps> = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-full rounded-3xl bg-white  dark:bg-gray-900";
+    : "relative w-[600px]  bg-gray-100 border-[1px] border-gray-200 rounded-3xl dark:bg-gray-900";
 
   return (
-    <div className="fixed  inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
+    <div className="fixed  inset-0 flex items-center justify-center overflow-y-auto modal z-99999 bg-black/40 backdrop-blur-[2px] transition-opacity">
       {!isFullscreen && (
         <div
-          className="fixed inset-0 h-full w-full  "
+          className="fixed mt-5 inset-0 h-full w-full  "
           onClick={onClose}
         ></div>
       )}
@@ -68,12 +68,12 @@ export const Modal: React.FC<ModalProps> = ({
         className={`${contentClasses}  ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className=' flex flex-row items-center justify-between'>
+        <div className='py-5 px-5 flex flex-row items-center justify-between'>
           <p className='text-gray-900 dark:text-gray-400 font-bold text-[18px]'>{heading}</p>
           {showCloseButton && (
             <button
               onClick={onClose}
-              className=""
+              className=" hover:bg-slate-400 p-2 rounded-full"
             >
               <CloseIcon className = 'text-gray-900 dark:text-gray-400' />
             </button>

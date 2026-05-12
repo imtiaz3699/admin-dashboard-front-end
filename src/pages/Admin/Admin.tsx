@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import BasicTables from '../Tables/BasicTables'
+import BasicTables from '../Tables/ProductTable'
 import { Modal } from '../../components/ui/modal';
 import AddAdmin from '../Forms/AddAdmin/AddAdmin';
 import { useFormik } from 'formik';

@@ -12,7 +12,7 @@ import Buttons from "./pages/UiElements/Buttons";
 import LineChart from "./pages/Charts/LineChart";
 import BarChart from "./pages/Charts/BarChart";
 import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
+import BasicTables from "./pages/Tables/ProductTable";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
@@ -20,7 +20,14 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/ProtectedRoutes/ProtectedRoutes";
 import Admin from "./pages/Admin/Admin";
+import Product from "./pages/Product/Product";
 import Managers from "./pages/Managers/Managers";
+import AddProduct from "./pages/Product/AddProduct";
+import Category from "./pages/Product/Category/Category";
+import Brand from "./pages/Product/Brand/Brand";
+import Branch from "./pages/Branch/Branch";
+import Stock from "./pages/Stock/Stock";
+import AddBranch from "./pages/Branch/AddBranch";
 export default function App() {
   return (
     <>
@@ -37,18 +44,24 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route index path="/dashboard" element={<Home />} />
               <Route path="/dashboard/admin" element={<Admin />} />
+              <Route path="/dashboard/product" element={<Product />} />
+              <Route path="/dashboard/add-product" element={<AddProduct />} />
+              <Route path="/dashboard/category" element={<Category />} />
+              <Route path="/dashboard/brand" element={<Brand />} />
+              <Route path="/dashboard/branch" element={<Branch />} />
+              <Route path="/dashboard/add-branch" element={<AddBranch />} />
+              <Route path="/dashboard/update-branch/:id" element={<AddBranch />} />
+              
+              <Route path="/dashboard/stock" element={<Stock />} />
               <Route path="/dashboard/managers" element={<Managers />} />
               {/* Others Page */}
               <Route path="/profile" element={<UserProfiles />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/blank" element={<Blank />} />
-
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
-
               {/* Tables */}
               {/* <Route path="/basic-tables" element={<BasicTables />} /> */}
-
               {/* Ui Elements */}
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/avatars" element={<Avatars />} />
@@ -56,7 +69,6 @@ export default function App() {
               <Route path="/buttons" element={<Buttons />} />
               <Route path="/images" element={<Images />} />
               <Route path="/videos" element={<Videos />} />
-
               {/* Charts */}
               <Route path="/line-chart" element={<LineChart />} />
               <Route path="/bar-chart" element={<BarChart />} />

@@ -29,19 +29,20 @@ export default function SignInForm() {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const res = await postRequest('/auth/login', values);
-        if (res?.status === 200) {
+        const res = await postRequest('/api/auth/login', values);
+        console.log(res,'fasdlfjkahsldkfjhalskdjfads')
+        if (res) {
           formik.setFieldValue('error', '');
-          Cookies.set("token", res?.data?.token, {
+          Cookies.set("token", res?.token, {
             expires: 7,
             secure: true,
           });
-          Cookies.set("user", JSON.stringify(res?.data?.user), {
+          Cookies.set("user", JSON.stringify(res?.user), {
             expires: 7,
             secure: true,
           });
-          setUser(res?.data?.user);
-          setToken(res?.data?.token);
+          setUser(res?.user);
+          setToken(res?.token);
           navigate("/dashboard")
         }
       } catch (error: any) {
