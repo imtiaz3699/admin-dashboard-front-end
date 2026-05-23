@@ -4,7 +4,7 @@ import { useApi } from '../../context/apiFuncContext'
 import { useQuery } from '@tanstack/react-query';
 
 function Branch() {
-    const { getRequest,deleteRequest } = useApi();
+    const { getRequest, deleteRequest } = useApi();
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState({
         page: 1,
@@ -23,20 +23,20 @@ function Branch() {
         queryKey: ["branches", pagination.page, pagination.limit],
         queryFn: fetchList
     })
-        const handleDelete = async(id: string) => {
+    const handleDelete = async (id: string) => {
         try {
             const res = await deleteRequest(`/api/branch/delete-branch/${id}`);
-            console.log(res,'fasdlfjhaskldhfIamResponsible')
-            if(res){
+            console.log(res, 'fasdlfjhaskldhfIamResponsible')
+            if (res) {
                 branchData.refetch();
             }
-        }catch (e) {
+        } catch (e) {
             console.log(e)
         }
     }
     return (
         <div>
-            <BranchTable data={branchData}  handleDelete={handleDelete} page={page} setPage={setPage} />
+            <BranchTable data={branchData} handleDelete={handleDelete} page={page} setPage={setPage} />
         </div>
     )
 }

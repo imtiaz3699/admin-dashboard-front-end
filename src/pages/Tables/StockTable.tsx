@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../compon
 import { MoreDotIcon } from "../../icons";
 import { Dropdown } from "../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../components/ui/dropdown/DropdownItem";
+import { convertToISODate, formatDate } from '../../components/common/helperFunctions'
+import Pagination from '../../components/common/Pagination'
 
 function StockTable({ data, handleDelete, setPage, page }: { data: any, handleDelete: any, page: number, setPage: React.Dispatch<React.SetStateAction<number>> }) {
     const tableHeadStyles = "px-5 py-3 font-bold text-nowrap text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -19,6 +21,7 @@ function StockTable({ data, handleDelete, setPage, page }: { data: any, handleDe
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
+
     return (
         <div>
             <PageMeta
@@ -143,60 +146,76 @@ function StockTable({ data, handleDelete, setPage, page }: { data: any, handleDe
 
                                 {/* Table Body */}
                                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {data?.data?.data?.length > 0 && data?.data?.data?.map((branch: any) => (
-                                        <TableRow key={branch?._id}>
+                                    {data?.data?.data?.length > 0 && data?.data?.data?.map((stock: any) => (
+                                        <TableRow key={stock?._id}>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {branch?.name}
+                                                {stock?.productId?.name}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {branch?.branchCode ?? "--"}
+                                                {stock?.branchId?.name ?? "--"}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {branch?.email ?? "--"}
+                                                {stock?.manager ?? "--"}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {branch?.phone ?? ""}
+                                                {stock?.quantity ?? "--"}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {branch?.managerId?.name ?? ""}
+                                                {stock?.reservedQty ?? ""}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                <div className='flex flex-col gap-1 divide-y'>
-                                                    <p className='!m-0 !p-0'>{branch?.address?.city ?? "N/A"}</p>
-                                                    <p className='!m-0 !p-0'>{branch?.address?.area ?? "N/A"}</p>
-                                                </div>
-
+                                                {stock?.damagedQty ?? ""}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                <div className={`px-1 py-1 ${branch?.status ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}  rounded-full text-black text-center font-medium`}>
-                                                    {branch?.status ? "Active" : "Inactive"}
-                                                </div>
+                                                {stock?.minStockLevel ?? ""}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {branch?.type ?? "--"}
+                                                {stock?.maxStockLevel ?? ""}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {stock?.averageCostPrice ?? ""}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {stock?.lastPurchasePrice ?? ""}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                PKR:{stock?.stockValue ?? ""}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {stock?.status ?? ""}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {formatDate(stock?.lastStockInAt) ?? ""}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {
+                                                    stock?.createdBy?.name ?? "--"
+                                                }
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {stock?.updatedBy?.name ?? "--"}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 relative left-0 text-theme-sm dark:text-gray-400">
                                                 <div
                                                     // onClick={() => setSelectUser(admin?._id)} 
                                                     className='cursor-pointer '>
-                                                    <MoreDotIcon onClick={() => setSelectStock(branch?._id)} />
+                                                    <MoreDotIcon onClick={() => setSelectStock(stock?._id)} />
                                                 </div>
                                                 <Dropdown className='!left-0 z-[999999]'
-                                                    isOpen={selectStock === branch?._id}
+                                                    isOpen={selectStock === stock?._id}
                                                     onClose={() => setSelectStock("")}
                                                 >
                                                     <DropdownItem
-                                                        onItemClick={() => { navigate(`/dashboard/update-branch/${branch?._id}`) }}
+                                                        onItemClick={() => { navigate(`/dashboard/update-branch/${stock?._id}`) }}
                                                     >
                                                         <div className='text-gray-'> Edit</div>
                                                     </DropdownItem>
                                                     <DropdownItem
-                                                        onItemClick={() => { handleDelete(branch?._id) }}
+                                                        onItemClick={() => { handleDelete(stock?._id) }}
                                                     >
                                                         <div>Delete</div>
                                                     </DropdownItem>
                                                 </Dropdown>
-
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -204,9 +223,13 @@ function StockTable({ data, handleDelete, setPage, page }: { data: any, handleDe
                             </Table>
                         </div>
                     </div>
-
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        limit={limit}
+                        onPageChange={handlePageChange}
+                    />
                 </ComponentCard>
-
             </div>
         </div>
     )

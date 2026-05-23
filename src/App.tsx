@@ -28,6 +28,7 @@ import Brand from "./pages/Product/Brand/Brand";
 import Branch from "./pages/Branch/Branch";
 import Stock from "./pages/Stock/Stock";
 import AddBranch from "./pages/Branch/AddBranch";
+import AddStock from "./pages/Stock/AddStock";
 export default function App() {
   return (
     <>
@@ -53,6 +54,7 @@ export default function App() {
               <Route path="/dashboard/update-branch/:id" element={<AddBranch />} />
               
               <Route path="/dashboard/stock" element={<Stock />} />
+              <Route path="/dashboard/add-stock" element={<AddStock />} />
               <Route path="/dashboard/managers" element={<Managers />} />
               {/* Others Page */}
               <Route path="/profile" element={<UserProfiles />} />

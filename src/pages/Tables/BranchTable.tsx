@@ -16,13 +16,10 @@ function BranchTable(
   const navigate = useNavigate();
   const tableHeadStyles = "px-5 py-3 font-bold text-gray-500 text-start text-theme-xs dark:text-gray-400"
   const [selectBranch, setSelectBranch] = useState("");
-
-  console.log(data?.data, 'fadlfjhasldfhalsdkjfhlaskdjfhlaskjdfsd')
   const currentPage = data?.data?.page;
   const limit = data?.data?.limit;
   const total = data?.data?.total;
   const totalPages = data?.data?.totalPages;
-
 
 
   const handlePageChange = (newPage: number) => {
