@@ -29,6 +29,11 @@ import Branch from "./pages/Branch/Branch";
 import Stock from "./pages/Stock/Stock";
 import AddBranch from "./pages/Branch/AddBranch";
 import AddStock from "./pages/Stock/AddStock";
+import StockMovement from "./pages/StockMovement/StockMovement";
+import StockInOut from "./pages/StockMovement/StockInOut";
+
+import Supplier from "./pages/Supplier/Supplier";
+import AddSupplier from "./pages/Supplier/AddSupplier";
 export default function App() {
   return (
     <>
@@ -52,9 +57,23 @@ export default function App() {
               <Route path="/dashboard/branch" element={<Branch />} />
               <Route path="/dashboard/add-branch" element={<AddBranch />} />
               <Route path="/dashboard/update-branch/:id" element={<AddBranch />} />
-              
+
               <Route path="/dashboard/stock" element={<Stock />} />
               <Route path="/dashboard/add-stock" element={<AddStock />} />
+              <Route path="/dashboard/update-stock/:id" element={<AddStock />} />
+
+              <Route path="/dashboard/stock-movement-system" element={<StockMovement />} />
+              <Route path="/dashboard/move-stock" element={<StockInOut />} />
+              
+
+              {/* //supplier */}
+              <Route path="/dashboard/supplier" element={<Supplier />} />
+              <Route path="/dashboard/add-supplier" element={<AddSupplier />} />
+              <Route path="/dashboard/update-supplier/:id" element={<AddSupplier />} />
+
+
+
+
               <Route path="/dashboard/managers" element={<Managers />} />
               {/* Others Page */}
               <Route path="/profile" element={<UserProfiles />} />

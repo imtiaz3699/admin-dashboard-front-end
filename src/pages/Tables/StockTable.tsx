@@ -206,7 +206,7 @@ function StockTable({ data, handleDelete, setPage, page }: { data: any, handleDe
                                                     onClose={() => setSelectStock("")}
                                                 >
                                                     <DropdownItem
-                                                        onItemClick={() => { navigate(`/dashboard/update-branch/${stock?._id}`) }}
+                                                        onItemClick={() => { navigate(`/dashboard/update-stock/${stock?._id}`) }}
                                                     >
                                                         <div className='text-gray-'> Edit</div>
                                                     </DropdownItem>

@@ -48,6 +48,12 @@ const navItems: NavItem[] = [
     ]
   },
   {
+    icon: <UserIcon />,
+    name: "Stock Movement System",
+    path: "/dashboard/stock-movement-system",
+
+  },
+  {
     icon: <Branch />,
     name: "Branch",
     path: "/dashboard/branch",
@@ -56,6 +62,11 @@ const navItems: NavItem[] = [
     icon: <Stock />,
     name: "Stock",
     path: "/dashboard/stock",
+  },
+  {
+    icon: <Stock />,
+    name: "Supplier",
+    path: "/dashboard/supplier",
   },
 
   {

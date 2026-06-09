@@ -13,7 +13,8 @@ interface SelectProps {
   label?: string;
   required?: boolean;
   name: string;
-  errors:string;
+  errors: string;
+  disabled?: boolean;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -25,6 +26,7 @@ const Select: React.FC<SelectProps> = ({
   required = false,
   name,
   errors,
+  disabled = false,
 }) => {
   let className = 'h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm shadow-theme-xs focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 '
   if (errors) {
@@ -41,6 +43,7 @@ const Select: React.FC<SelectProps> = ({
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
         className={`${className}`}
+        disabled={disabled}
       >
         <option value="" disabled>
           {placeholder}

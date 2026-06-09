@@ -108,7 +108,7 @@ function AddBranch() {
                     area: res?.address?.area
                 },
                 status: res?.status,
-                openingDate: res?.openingDate,
+            openingDate: res?.openingDate,
                 createdBy: res?.createdBy,
                 updatedBy: res?.updatedBy
             });
