@@ -56,10 +56,12 @@ import { ReactComponent as Manager } from "./manager.svg?react";
 import { TiTick as Tick } from "react-icons/ti";
 import { AiOutlineStock as Stock } from "react-icons/ai";
 import { IoGitBranchOutline as Branch } from "react-icons/io5";
+import { BiPurchaseTagAlt as PurchaseOrder } from "react-icons/bi";
 
 export {
   Stock,
   Branch,
+  PurchaseOrder,
   ErrorHexaIcon,
   AlertHexaIcon,
   MoreDotIcon,

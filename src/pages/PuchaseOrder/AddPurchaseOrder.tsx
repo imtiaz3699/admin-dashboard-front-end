@@ -1,0 +1,211 @@
+import React from 'react'
+import { useFormik } from 'formik'
+import { useUser } from '../../context/userContext'
+import { useApi } from '../../context/apiFuncContext';
+import { useQuery } from '@tanstack/react-query';
+import Select from '../../components/form/Select';
+import SearchDropdown from '../../components/form/form-elements/SearchDropDown';
+import Button from '../../components/ui/button/Button';
+function AddPurchaseOrder() {
+    const { user } = useUser();
+    const { getRequest, postRequest } = useApi();
+    const formik = useFormik({
+        initialValues: {
+            supplierId: "",
+            branchId: "",
+            items: [{
+                productId: "",
+                quantity: "",
+                costPrice: "",
+                name: ""
+            },
+            ],
+            totalAmount: 0,
+            createdBy: user?._id || "",
+        },
+        onSubmit: async (values) => {
+            try {
+                const res = await postRequest("/api/purchase/create-purchase", values, true)
+                console.log(res, 'fadlfjkhalsdkjfhlaskdjfhlaksjdh')
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+    })
+    const getSupplierList = async () => {
+        try {
+            const res = await getRequest("/api/supplier/get-all-suppliers");
+            return res;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    const getBranchesList = async () => {
+        try {
+            const res = await getRequest("/api/branch/get-branches");
+            return res;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    const fetchProducts = async (query: string) => {
+        try {
+            const res = await getRequest(`/api/product/find-product/${query}`)
+            return res;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    const suppliers = useQuery({
+        queryKey: ["suppliers"],
+        queryFn: getSupplierList
+    })
+    const branches = useQuery({
+        queryKey: ["branches"],
+        queryFn: getBranchesList
+    })
+
+    const supplierOptions = suppliers?.data?.data?.data?.map((supplier: any) => ({ label: supplier?.name, value: supplier?._id })
+    )
+    const branchesOptions = branches?.data?.data?.map((branch: any) => ({ label: branch?.name, value: branch?._id }))
+
+    console.log(formik.values, 'suppliers and branches')
+    React.useEffect(() => {
+        const totalAmount = formik.values?.items?.reduce((acc, curr: any) => acc + (curr?.costPrice * curr?.quantity), 0)
+        formik.setFieldValue("totalAmount", totalAmount)
+    }, [formik.values.items])
+
+    return (
+        <form onSubmit={formik.handleSubmit} className='w-full space-y-5'>
+            <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Create Purchase Order</h1>
+            <div className='flex flex-row items-center gap-5'>
+                <Select
+                    label="Select Supplier"
+                    options={supplierOptions || []}
+                    value={formik.values.supplierId}
+                    onChange={(value) => formik.setFieldValue("supplierId", value)}
+                    name='supplierId'
+                    required={true}
+                    errors={formik.touched?.supplierId && formik.errors?.supplierId ? formik.errors?.supplierId : ""}
+                />
+                <Select
+                    label="Select Branch"
+                    options={branchesOptions || []}
+                    value={formik.values.branchId}
+                    onChange={(value) => formik.setFieldValue("branchId", value)}
+                    name='branchId'
+                    required={true}
+                    errors={formik.touched?.branchId && formik.errors?.branchId ? formik.errors?.branchId : ""}
+                />
+            </div>
+            <div className='flex flex-col items-start gap-5'>
+                <SearchDropdown
+                    label="Select Product"
+                    fetchOptions={fetchProducts}
+                    value={formik.values.items?.[0]?.productId}
+                    onChange={(selected) => {
+                        const currentItems = formik.values.items || [];
+
+                        // remove empty objects (IMPORTANT FIX)
+                        const cleanedItems = currentItems.filter(
+                            (i) => i.productId
+                        );
+
+                        // prevent duplicate
+                        const exists = cleanedItems.some(
+                            (i) => i.productId === selected?._id
+                        );
+
+                        if (exists) return;
+
+                        formik.setFieldValue("items", [
+                            ...cleanedItems,
+                            {
+                                productId: selected?._id,
+                                quantity: 0,
+                                costPrice: selected?.costPrice,
+                                name: selected?.name
+                            },
+                        ]);
+                    }}
+                    placeholder="Search product"
+                />
+                <div className='flex flex-row items-center gap-2'>
+                    {formik.values?.items?.length > 0 &&
+                        formik.values.items.map((item, index) => (
+                            <div
+                                key={index}
+                                className="flex flex-col gap-2 p-3 border rounded-lg mb-3"
+                            >
+                                {/* Product Name */}
+                                <div className="text-sm font-semibold text-gray-700">
+                                    {item?.name || "Product"}
+                                </div>
+
+                                {/* Quantity Controls */}
+                                <div className="flex items-center gap-3">
+
+                                    {/* Minus Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const current = formik.values.items[index].quantity || 0;
+                                            if (current <= 0) return;
+
+                                            formik.setFieldValue(
+                                                `items.${index}.quantity`,
+                                                current - 1
+                                            );
+                                        }}
+                                        className="px-3 py-1 bg-gray-200 rounded"
+                                    >
+                                        -
+                                    </button>
+
+                                    {/* Quantity Input */}
+                                    <input
+                                        type="number"
+                                        value={item?.quantity}
+                                        onChange={(e) =>
+                                            formik.setFieldValue(
+                                                `items.${index}.quantity`,
+                                                Number(e.target.value)
+                                            )
+                                        }
+                                        className="w-20 text-center border rounded"
+                                    />
+
+                                    {/* Plus Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const current = formik.values.items[index].quantity || 0;
+
+                                            formik.setFieldValue(
+                                                `items.${index}.quantity`,
+                                                current + 1
+                                            );
+                                        }}
+                                        className="px-3 py-1 bg-gray-200 rounded"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                </div>
+            </div>
+            <div className='flex flex-row items-center justify-end gap-5'>
+                <Button type='submit' size='md' variant='primary' >
+                    {"Submit"}
+                </Button>
+                <Button size='md' variant='outline' >
+                    Cancel
+                </Button>
+            </div>
+        </form>
+    )
+}
+
+export default AddPurchaseOrder

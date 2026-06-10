@@ -30,10 +30,12 @@ import Stock from "./pages/Stock/Stock";
 import AddBranch from "./pages/Branch/AddBranch";
 import AddStock from "./pages/Stock/AddStock";
 import StockMovement from "./pages/StockMovement/StockMovement";
-import StockInOut from "./pages/StockMovement/StockInOut";
+import StockIn from "./pages/StockMovement/StockIn";
 
 import Supplier from "./pages/Supplier/Supplier";
 import AddSupplier from "./pages/Supplier/AddSupplier";
+import PurchaseOrder from "./pages/PuchaseOrder/PurchaseOrder";
+import AddPurchaseOrder from "./pages/PuchaseOrder/AddPurchaseOrder";
 export default function App() {
   return (
     <>
@@ -58,13 +60,16 @@ export default function App() {
               <Route path="/dashboard/add-branch" element={<AddBranch />} />
               <Route path="/dashboard/update-branch/:id" element={<AddBranch />} />
 
+              <Route path="/dashboard/purchase-orders" element={<PurchaseOrder />} />
+              <Route path="/dashboard/add-purchase-order" element={<AddPurchaseOrder />} />
               <Route path="/dashboard/stock" element={<Stock />} />
               <Route path="/dashboard/add-stock" element={<AddStock />} />
               <Route path="/dashboard/update-stock/:id" element={<AddStock />} />
 
               <Route path="/dashboard/stock-movement-system" element={<StockMovement />} />
-              <Route path="/dashboard/move-stock" element={<StockInOut />} />
-              
+              <Route path="/dashboard/stock-in" element={<StockIn stock="IN" />} />
+              <Route path="/dashboard/stock-out" element={<StockIn stock="OUT" />} />
+              <Route path="/dashboard/stock-transfer" element={<StockIn stock="TRANSFER" />} />
 
               {/* //supplier */}
               <Route path="/dashboard/supplier" element={<Supplier />} />

@@ -13,7 +13,8 @@ import {
   UserCircleIcon,
   UserIcon,
   Stock,
-  Branch
+  Branch,
+  PurchaseOrder
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -38,6 +39,11 @@ const navItems: NavItem[] = [
     path: "/dashboard/admin",
   },
   {
+    icon: <PurchaseOrder />,
+    name: "Purchase Orders",
+    path: "/dashboard/purchase-orders",
+  },
+  {
     icon: <UserIcon />,
     name: "Product",
     path: "/dashboard/product",
@@ -51,7 +57,11 @@ const navItems: NavItem[] = [
     icon: <UserIcon />,
     name: "Stock Movement System",
     path: "/dashboard/stock-movement-system",
-
+    subItems: [
+      { name: "Stock In", path: "/dashboard/stock-in", pro: false },
+      { name: "Stock Out", path: "/dashboard/stock-out", pro: false },
+      { name: "Stock Transfer", path: "/dashboard/stock-transfer", pro: false },
+    ]
   },
   {
     icon: <Branch />,
