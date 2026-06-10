@@ -6,7 +6,7 @@ import { useApi } from '../../context/apiFuncContext';
 import Select from '../../components/form/Select';
 import InputWithLabel from '../../components/InputWithLabel/InputWithLabel';
 import Button from '../../components/ui/button/Button';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
 import { useUser } from '../../context/userContext';
 export const stockMovementSchema = Yup.object().shape({
@@ -54,6 +54,7 @@ export const stockMovementSchema = Yup.object().shape({
   userId: Yup.string().required("User is required"),
 });
 function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
+  const navigate = useNavigate();
   const { getRequest, postRequest } = useApi();
   const { user } = useUser();
   const { id } = useParams();
@@ -78,6 +79,10 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
       console.log(values, 'values submitted')
       try {
         const res = await postRequest("/api/stock-movement/create-stock-movement", { ...values, referenceId: values.referenceId || undefined, }, true);
+        if (res) {
+          formik.resetForm();
+          // navigate('/dashboard/stock-movement');
+        }
       } catch (e) {
         console.error(e);
       }
@@ -95,29 +100,17 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
 
   const getProductList = async () => {
     try {
-      const res = await getRequest(`/api/product/all-product`);
+      const res = await getRequest(`/api/purchase/get-products-by-purchase-order-id/${formik.values.referenceId}`);
       return res;
     } catch (e) {
       console.log(e);
     }
   }
-  const getStock = async () => {
-    try {
-      const res = await getRequest(`/api/stock/get-stock-by-product-branch?productId=${formik.values.productId}&branchId=${formik.values.fromBranchId}`);
-      return res;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  const getAvailableStock = useQuery({
-    queryKey: ["available-stock", formik.values.productId, formik.values.fromBranchId],
-    queryFn: getStock,
-    enabled: !!formik.values.productId || !!formik.values.fromBranchId,
-  })
 
   const productList = useQuery({
-    queryKey: ['product-list'],
+    queryKey: ['product-list', formik.values.referenceId],
     queryFn: getProductList,
+    enabled: !!formik.values.referenceId
   });
   const branchesList = useQuery({
     queryKey: ['branches-list'],
@@ -129,12 +122,14 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
       value: branch?._id
     }
   })
-  const productOption = productList?.data?.data?.map((product: any) => {
+  console.log(productList?.data?.data?.items, 'faldsfjlasjkdfhlasjkdfhlasjkd')
+  const productOption = productList?.data?.data?.items?.map((product: any) => {
     return {
-      label: product?.name,
-      value: product?._id
+      label: product?.productId?.name,
+      value: product?.productId?._id
     }
   })
+  console.log(productOption, 'fasld;jfhalsdjfhlajskdfhlaskjdfhlkashdflas')
   const referenceTypeOptions = [
     stock === "OUT" && {
       label: "SALE",
@@ -153,7 +148,23 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
       value: "ADJUSTMENT"
     }
   ].filter(Boolean)
-  console.log(formik.errors, user?._id, formik.values, 'fasdlfjhalsdjfhlasdjfhlasjkdhfasd3f31asd3f54a3sd4f')
+  const purchaseOrder = useQuery({
+    queryKey: ["purchase-order"],
+    queryFn: () => getRequest(`/api/purchase/get-pending-purchase-orders`),
+  })
+  const purchaseOrdersOptions = purchaseOrder?.data?.data?.map((element:any, idx:number) => {
+    return {
+      label: element?.invoiceNumber,
+      value: element?._id
+    }
+  })
+  React.useEffect(() => {
+    const totalQuantity = productList?.data?.data?.items?.find((product: any) => product?.productId?._id === formik.values.productId)?.quantity;
+    const costPrice = productList?.data?.data?.items?.find((product: any) => product?.productId?._id === formik.values.productId)?.costPrice;
+    formik.setFieldValue("quantity", totalQuantity);
+    formik.setFieldValue("costPrice", costPrice);
+  }, [formik.values.productId])
+  console.log(availableQuqntity, 'fasdlfjhalsdjfhlasdjfhlasjkdhfasd3f31asd3f54a3sd4f')
   return (
     <form onSubmit={formik.handleSubmit} className='w-full space-y-5' >
       <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Stock Movement</h1>
@@ -187,29 +198,39 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
           required={true}
           errors={formik.touched?.referenceType && formik.errors?.referenceType ? formik.errors?.referenceType : ""}
         />
-        <div className='flex flex-col items-start gap-1 w-full '>
-
-
-          <InputWithLabel label='Quantity' name='quantity'
+        {
+          formik.values.referenceType === "PURCHASE" && <Select
+            label="Select Purchase Order"
+            options={purchaseOrdersOptions}
+            value={formik.values.referenceId}
+            onChange={(value) => formik.setFieldValue("referenceId", value)}
+            name='referenceId'
             required={true}
-            type="number"
-            value={formik.values.quantity}
-            onChange={formik.handleChange}
-            disabled={formik.isSubmitting}
-            error={formik.touched.quantity && formik.errors.quantity ? true : false}
-            errorMessage={formik.touched.quantity && formik.errors.quantity ? formik.errors.quantity : ""}
+            errors={formik.touched?.referenceId && formik.errors?.referenceId ? formik.errors?.referenceId : ""}
           />
-          {
-            getAvailableStock?.data?.data?._id && <span className='text-xs text-gray-500' >Available Quantity: {getAvailableStock?.data?.data?.quantity || 0} {" "} Damaged Quantity:{getAvailableStock?.data?.data?.damagedQty || 0} {" "} Reserved Quantity: {getAvailableStock?.data?.data?.reservedQty || 0}</span>
-          }
-          {
-            getAvailableStock?.isFetched && !getAvailableStock?.data && <span>No Quantity available for this product in this branch.</span>
-          }
-        </div>
+        }
+
+      </div>
+      <div className='flex flex-col items-start gap-1 w-full '>
+
+
+        <InputWithLabel label='Quantity' name='quantity'
+          required={true}
+          type="number"
+          value={formik.values.quantity}
+          onChange={formik.handleChange}
+          disabled={formik.isSubmitting}
+          error={formik.touched.quantity && formik.errors.quantity ? true : false}
+          errorMessage={formik.touched.quantity && formik.errors.quantity ? formik.errors.quantity : ""}
+        />
+        {/* {
+          getAvailableStock?.data?.data?._id && <span className='text-xs text-gray-500' >Available Quantity: {getAvailableStock?.data?.data?.quantity || 0} {" "} Damaged Quantity:{getAvailableStock?.data?.data?.damagedQty || 0} {" "} Reserved Quantity: {getAvailableStock?.data?.data?.reservedQty || 0}</span>
+        } */}
+
       </div>
       <div className='flex flex-row items-center gap-5'>
         {
-          stock === "TRANSFER" && <Select
+          formik.values.referenceType === "TRANSFER" && <Select
             label="From Branch"
             options={branchOptions}
             value={formik.values.fromBranchId}
@@ -220,7 +241,7 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
           />
         }
         {
-          (stock === "TRANSFER") && <Select
+          formik.values.referenceType === "TRANSFER" && <Select
             label="To Branch"
             options={branchOptions}
             value={formik.values.toBranchId}

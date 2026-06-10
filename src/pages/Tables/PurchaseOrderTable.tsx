@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PageBreadcrumb from '../../components/common/PageBreadCrumb'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/ui/table'
 import ComponentCard from '../../components/common/ComponentCard'
 import { useNavigate } from 'react-router'
-function PurchaseOrderTable() {
+import { MoreDotIcon } from '../../icons'
+import { Dropdown } from "../../components/ui/dropdown/Dropdown";
+import { DropdownItem } from "../../components/ui/dropdown/DropdownItem";
+function PurchaseOrderTable({ data }: { data: any }) {
+    const [selectPurchaseOrder, setSelectPurchaseOrder] = useState("")
     const navigate = useNavigate()
     const tableHeadStyles = "px-5 py-3 font-bold text-gray-500 text-start text-theme-xs dark:text-gray-400"
     return (
@@ -20,6 +24,9 @@ function PurchaseOrderTable() {
                             <TableHeader>
                                 <TableRow>
                                     <TableCell className={tableHeadStyles}>
+                                        Invoice Number
+                                    </TableCell>
+                                    <TableCell className={tableHeadStyles}>
                                         Supplier
                                     </TableCell>
                                     <TableCell className={tableHeadStyles}>
@@ -27,6 +34,9 @@ function PurchaseOrderTable() {
                                     </TableCell>
                                     <TableCell className={tableHeadStyles}>
                                         Products
+                                    </TableCell>
+                                    <TableCell className={tableHeadStyles}>
+                                        Stauts
                                     </TableCell>
                                     <TableCell className={tableHeadStyles}>
                                         Total Amount
@@ -37,23 +47,50 @@ function PurchaseOrderTable() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        Supplier
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        Branch
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        Products
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        Total Amount
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        Actions
-                                    </TableCell>
-                                </TableRow>
+                                {
+                                    data?.map((element:any, idx:number) => {
+                                        return <TableRow key={element?._id}>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {element?.invoiceNumber}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {element?.supplierId?.name}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {element?.branchId?.name}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {element?.items?.length}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                {element?.status}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                                $ {element?.totalAmount}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-3 text-gray-500 relative left-0 text-theme-sm dark:text-gray-400">
+                                                <div
+                                                    // onClick={() => setSelectUser(admin?._id)} 
+                                                    className='cursor-pointer '>
+                                                    <MoreDotIcon onClick={() => setSelectPurchaseOrder(element?._id)} />
+                                                </div>
+                                                <Dropdown className='!left-0 z-[999999]'
+                                                    isOpen={selectPurchaseOrder === element?._id}
+                                                    onClose={() => setSelectPurchaseOrder("")}
+                                                >
+                                                    <DropdownItem
+                                                        onItemClick={() => { navigate(`/dashboard/update-branch/${element?._id}`) }}
+                                                    >
+                                                        <div className='text-gray-'> Edit</div>
+                                                    </DropdownItem>
+                                                    <DropdownItem>
+                                                        <div>Delete</div>
+                                                    </DropdownItem>
+                                                </Dropdown>
+                                            </TableCell>
+                                        </TableRow>
+                                    })
+                                }
                             </TableBody>
                         </Table>
 
