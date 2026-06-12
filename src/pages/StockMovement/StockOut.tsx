@@ -100,7 +100,13 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
 
     const getProductList = async () => {
         try {
-            const res = await getRequest(`/api/purchase/get-products-by-purchase-order-id/${formik.values.referenceId}`);
+            let res;
+            if (formik.values.referenceType === "TRANSFER") {
+                res = await getRequest(`/api/stock/available-products-per-branch/${formik.values.branchId}`);
+            } else if (formik.values.referenceType === "PURCHASE") {
+                res = await getRequest(`/api/purchase/get-products-by-purchase-order-id/${formik.values.referenceId}`);
+            }
+
             return res;
         } catch (e) {
             console.log(e);
@@ -108,9 +114,9 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
     }
 
     const productList = useQuery({
-        queryKey: ['product-list', formik.values.referenceId],
+        queryKey: ['product-list', formik.values.referenceId,formik.values.branchId],
         queryFn: getProductList,
-        enabled: !!formik.values.referenceId
+        enabled: !!formik.values.referenceId || !!formik.values.branchId
     });
     const branchesList = useQuery({
         queryKey: ['branches-list'],

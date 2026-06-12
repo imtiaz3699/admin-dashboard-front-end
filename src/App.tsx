@@ -36,6 +36,7 @@ import Supplier from "./pages/Supplier/Supplier";
 import AddSupplier from "./pages/Supplier/AddSupplier";
 import PurchaseOrder from "./pages/PuchaseOrder/PurchaseOrder";
 import AddPurchaseOrder from "./pages/PuchaseOrder/AddPurchaseOrder";
+import StockOut from "./pages/StockMovement/StockOut";
 export default function App() {
   return (
     <>
@@ -68,7 +69,7 @@ export default function App() {
 
               <Route path="/dashboard/stock-movement-system" element={<StockMovement />} />
               <Route path="/dashboard/stock-in" element={<StockIn stock="IN" />} />
-              <Route path="/dashboard/stock-out" element={<StockIn stock="OUT" />} />
+              <Route path="/dashboard/stock-out" element={<StockOut stock="OUT" />} />
               <Route path="/dashboard/stock-transfer" element={<StockIn stock="TRANSFER" />} />
 
               {/* //supplier */}
