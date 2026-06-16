@@ -37,6 +37,7 @@ import AddSupplier from "./pages/Supplier/AddSupplier";
 import PurchaseOrder from "./pages/PuchaseOrder/PurchaseOrder";
 import AddPurchaseOrder from "./pages/PuchaseOrder/AddPurchaseOrder";
 import StockOut from "./pages/StockMovement/StockOut";
+import Sale from "./pages/sale/Sale";
 export default function App() {
   return (
     <>
@@ -60,6 +61,9 @@ export default function App() {
               <Route path="/dashboard/branch" element={<Branch />} />
               <Route path="/dashboard/add-branch" element={<AddBranch />} />
               <Route path="/dashboard/update-branch/:id" element={<AddBranch />} />
+              <Route path="/dashboard/sales" element={<Sale />} />
+
+
 
               <Route path="/dashboard/purchase-orders" element={<PurchaseOrder />} />
               <Route path="/dashboard/add-purchase-order" element={<AddPurchaseOrder />} />

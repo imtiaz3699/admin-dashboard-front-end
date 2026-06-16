@@ -14,7 +14,8 @@ import {
   UserIcon,
   Stock,
   Branch,
-  PurchaseOrder
+  PurchaseOrder,
+  Sales
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -74,9 +75,9 @@ const navItems: NavItem[] = [
     path: "/dashboard/stock",
   },
   {
-    icon: <Stock />,
-    name: "Supplier",
-    path: "/dashboard/supplier",
+    icon: <Sales />,
+    name: "Sales",
+    path: "/dashboard/sales",
   },
 
   {

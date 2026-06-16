@@ -58,6 +58,7 @@ import { AiOutlineStock as Stock } from "react-icons/ai";
 import { IoGitBranchOutline as Branch } from "react-icons/io5";
 import { BiPurchaseTagAlt as PurchaseOrder } from "react-icons/bi";
 import { RiErrorWarningLine as Warning } from "react-icons/ri";
+import { FcSalesPerformance as Sales } from "react-icons/fc";
 
 export {
   Stock,
@@ -119,5 +120,6 @@ export {
   ChatIcon,
   Manager,
   Tick,
-  Warning
+  Warning,
+  Sales
 };

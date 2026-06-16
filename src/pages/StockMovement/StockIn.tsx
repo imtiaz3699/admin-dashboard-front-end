@@ -153,10 +153,6 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
       label: "TRANSFER",
       value: "TRANSFER"
     },
-    {
-      label: "ADJUSTMENT",
-      value: "ADJUSTMENT"
-    }
   ].filter(Boolean)
 
   const purchaseOrder = useQuery({
@@ -174,7 +170,7 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
   React.useEffect(() => {
     const totalQuantity = productList?.data?.find((product: any) => product?.productId?._id === formik.values.productId)?.quantity;
     const costPrice = productList?.data?.find((product: any) => product?.productId?._id === formik.values.productId)?.productId?.costPrice;
-    
+
     formik.setFieldValue("quantity", totalQuantity);
     formik.setFieldValue("costPrice", costPrice);
   }, [formik.values.productId])
