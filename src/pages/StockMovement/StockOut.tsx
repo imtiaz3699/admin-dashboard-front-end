@@ -100,24 +100,24 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
 
     const getProductList = async () => {
         try {
+            const type = formik.values.referenceType;
             let res;
-            if (formik.values.referenceType === "TRANSFER") {
+            if (type === "SALE") {
                 res = await getRequest(`/api/stock/available-products-per-branch/${formik.values.branchId}`);
-            } else if (formik.values.referenceType === "PURCHASE") {
-                res = await getRequest(`/api/purchase/get-products-by-purchase-order-id/${formik.values.referenceId}`);
             }
-
-            return res;
+            return res?.data;
         } catch (e) {
             console.log(e);
         }
     }
+    
 
     const productList = useQuery({
-        queryKey: ['product-list', formik.values.referenceId,formik.values.branchId],
+        queryKey: ['product-list', formik.values.branchId],
         queryFn: getProductList,
-        enabled: !!formik.values.referenceId || !!formik.values.branchId
+        enabled: !!formik.values.branchId
     });
+    console.log(productList,'faldfhlaksjdfhlasjkdfhlakjsfd')
     const branchesList = useQuery({
         queryKey: ['branches-list'],
         queryFn: getBranchesList
@@ -128,14 +128,13 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
             value: branch?._id
         }
     })
-    console.log(productList?.data?.data?.items, 'faldsfjlasjkdfhlasjkdfhlasjkd')
-    const productOption = productList?.data?.data?.items?.map((product: any) => {
+    const productOption = productList?.data?.data?.map((product: any) => {
         return {
             label: product?.productId?.name,
             value: product?.productId?._id
         }
-    })
-    console.log(productOption, 'fasld;jfhalsdjfhlajskdfhlaskjdfhlkashdflas')
+    });
+
     const referenceTypeOptions = [
         stock === "OUT" && {
             label: "SALE",
@@ -154,30 +153,22 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
             value: "ADJUSTMENT"
         }
     ].filter(Boolean)
-    const purchaseOrder = useQuery({
-        queryKey: ["purchase-order"],
-        queryFn: () => getRequest(`/api/purchase/get-pending-purchase-orders`),
-    })
-    const purchaseOrdersOptions = purchaseOrder?.data?.data?.map((element: any, idx: number) => {
-        return {
-            label: element?.invoiceNumber,
-            value: element?._id
-        }
-    })
+
+
+    
     React.useEffect(() => {
         const totalQuantity = productList?.data?.data?.items?.find((product: any) => product?.productId?._id === formik.values.productId)?.quantity;
         const costPrice = productList?.data?.data?.items?.find((product: any) => product?.productId?._id === formik.values.productId)?.costPrice;
         formik.setFieldValue("quantity", totalQuantity);
         formik.setFieldValue("costPrice", costPrice);
     }, [formik.values.productId])
-    console.log(availableQuqntity, 'fasdlfjhalsdjfhlasdjfhlasjkdhfasd3f31asd3f54a3sd4f')
     return (
         <form onSubmit={formik.handleSubmit} className='w-full space-y-5' >
             <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Stock Movement</h1>
             <div className='flex flex-row items-center gap-5'>
                 <Select
                     label="Select Branch"
-                    options={branchOptions}
+                    options={branchOptions || []}
                     value={formik.values.branchId}
                     onChange={(value) => formik.setFieldValue("branchId", value)}
                     name='branchId'
@@ -186,7 +177,7 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
                 />
                 <Select
                     label="Select Product"
-                    options={productOption}
+                    options={productOption || []}
                     value={formik.values.productId}
                     onChange={(value) => formik.setFieldValue("productId", value)}
                     name='productId'
@@ -204,21 +195,8 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
                     required={true}
                     errors={formik.touched?.referenceType && formik.errors?.referenceType ? formik.errors?.referenceType : ""}
                 />
-                {
-                    formik.values.referenceType === "PURCHASE" && <Select
-                        label="Select Purchase Order"
-                        options={purchaseOrdersOptions}
-                        value={formik.values.referenceId}
-                        onChange={(value) => formik.setFieldValue("referenceId", value)}
-                        name='referenceId'
-                        required={true}
-                        errors={formik.touched?.referenceId && formik.errors?.referenceId ? formik.errors?.referenceId : ""}
-                    />
-                }
-
             </div>
             <div className='flex flex-col items-start gap-1 w-full '>
-
 
                 <InputWithLabel label='Quantity' name='quantity'
                     required={true}

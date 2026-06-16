@@ -100,36 +100,46 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
 
   const getProductList = async () => {
     try {
-      const res = await getRequest(`/api/purchase/get-products-by-purchase-order-id/${formik.values.referenceId}`);
-      return res;
+      const type = formik.values.referenceType;
+      let res;
+      if (type === "TRANSFER") {
+        res = await getRequest(`/api/stock/available-products-per-branch/${formik.values.fromBranchId}`);
+      }
+      if (type === "PURCHASE") {
+        res = await getRequest(`/api/purchase/get-products-by-purchase-order-id/${formik.values.referenceId}`);
+      }
+      return res?.data;
     } catch (e) {
       console.log(e);
     }
   }
 
   const productList = useQuery({
-    queryKey: ['product-list', formik.values.referenceId],
+    queryKey: ['product-list', formik.values.referenceId, formik.values.fromBranchId],
     queryFn: getProductList,
-    enabled: !!formik.values.referenceId
+    enabled: !!formik.values.referenceId || !!formik.values.fromBranchId
   });
+
+  console.log(productList, 'fadlfjhaldkjfhlaskjdfhlasjdfhljkasd')
   const branchesList = useQuery({
     queryKey: ['branches-list'],
     queryFn: getBranchesList
   });
+
   const branchOptions = branchesList?.data?.data?.map((branch: any) => {
     return {
       label: branch?.name,
       value: branch?._id
     }
   })
-  console.log(productList?.data?.data?.items, 'faldsfjlasjkdfhlasjkdfhlasjkd')
-  const productOption = productList?.data?.data?.items?.map((product: any) => {
+
+  const productOption = productList?.data?.map((product: any) => {
     return {
       label: product?.productId?.name,
       value: product?.productId?._id
     }
   })
-  console.log(productOption, 'fasld;jfhalsdjfhlajskdfhlaskjdfhlkashdflas')
+
   const referenceTypeOptions = [
     stock === "OUT" && {
       label: "SALE",
@@ -148,23 +158,27 @@ function StockInOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
       value: "ADJUSTMENT"
     }
   ].filter(Boolean)
+
   const purchaseOrder = useQuery({
     queryKey: ["purchase-order"],
     queryFn: () => getRequest(`/api/purchase/get-pending-purchase-orders`),
   })
-  const purchaseOrdersOptions = purchaseOrder?.data?.data?.map((element:any, idx:number) => {
+
+  const purchaseOrdersOptions = purchaseOrder?.data?.data?.map((element: any, idx: number) => {
     return {
       label: element?.invoiceNumber,
       value: element?._id
     }
   })
+
   React.useEffect(() => {
-    const totalQuantity = productList?.data?.data?.items?.find((product: any) => product?.productId?._id === formik.values.productId)?.quantity;
-    const costPrice = productList?.data?.data?.items?.find((product: any) => product?.productId?._id === formik.values.productId)?.costPrice;
+    const totalQuantity = productList?.data?.find((product: any) => product?.productId?._id === formik.values.productId)?.quantity;
+    const costPrice = productList?.data?.find((product: any) => product?.productId?._id === formik.values.productId)?.productId?.costPrice;
+    
     formik.setFieldValue("quantity", totalQuantity);
     formik.setFieldValue("costPrice", costPrice);
   }, [formik.values.productId])
-  console.log(availableQuqntity, 'fasdlfjhalsdjfhlasdjfhlasjkdhfasd3f31asd3f54a3sd4f')
+
   return (
     <form onSubmit={formik.handleSubmit} className='w-full space-y-5' >
       <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Stock Movement</h1>

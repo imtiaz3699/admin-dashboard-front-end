@@ -57,6 +57,7 @@ import { TiTick as Tick } from "react-icons/ti";
 import { AiOutlineStock as Stock } from "react-icons/ai";
 import { IoGitBranchOutline as Branch } from "react-icons/io5";
 import { BiPurchaseTagAlt as PurchaseOrder } from "react-icons/bi";
+import { RiErrorWarningLine as Warning } from "react-icons/ri";
 
 export {
   Stock,
@@ -118,4 +119,5 @@ export {
   ChatIcon,
   Manager,
   Tick,
+  Warning
 };
