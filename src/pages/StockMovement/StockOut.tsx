@@ -93,7 +93,12 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
                 toBranchId: values.toBranchId || undefined
             }
             try {
+                if (values.referenceType === "SALE") {
+                   const res = await postRequest("/api/sale/create-sale", payload, true);
+                   console.log(res,'fasldfjhalsdfjhalskdjfhlaskjdfs')
+                }
                 const res = await postRequest("/api/stock-movement/create-stock-movement", payload, true);
+
                 if (res) {
                     formik.resetForm();
                     queryClient.invalidateQueries({
@@ -124,8 +129,11 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
         try {
             let type = formik.values.referenceType;
             let branchId = type === "SALE" ? formik.values.branchId : formik.values.fromBranchId;
-            const res = await getRequest(`/api/stock/available-products-per-branch/${branchId}`);;
-            return res?.data;
+            if (branchId) {
+                const res = await getRequest(`/api/stock/available-products-per-branch/${branchId}`);;
+                return res?.data;
+            }
+
         } catch (e) {
             console.log(e);
         }
@@ -133,7 +141,7 @@ function StockOut({ stock }: { stock: "IN" | "OUT" | "TRANSFER" }) {
 
 
     const productList = useQuery({
-        queryKey: ['product-list', formik.values.branchId, formik.values.fromBranchId],
+        queryKey: ['product-list', formik.values.branchId, formik.values.fromBranchId, formik.values.referenceType],
         queryFn: getProductList,
         enabled: !!formik.values.branchId || !!formik.values.fromBranchId
     });

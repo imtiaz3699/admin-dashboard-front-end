@@ -12,7 +12,6 @@ import Pagination from '../../components/common/Pagination';
 function BranchTable(
   { data, handleDelete, setPage, page }:
     { data: any, handleDelete: any, page: number, setPage: React.Dispatch<React.SetStateAction<number>> }) {
-
   const navigate = useNavigate();
   const tableHeadStyles = "px-5 py-3 font-bold text-gray-500 text-start text-theme-xs dark:text-gray-400"
   const [selectBranch, setSelectBranch] = useState("");
@@ -20,8 +19,6 @@ function BranchTable(
   const limit = data?.data?.limit;
   const total = data?.data?.total;
   const totalPages = data?.data?.totalPages;
-
-
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };

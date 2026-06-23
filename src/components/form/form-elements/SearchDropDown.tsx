@@ -7,9 +7,13 @@ export default function SearchDropdown({
     placeholder = "Search...",
     labelKey = "name",
     label,
+    module,
+    branchId,
 }: {
     value: any;
-    label:string
+    branchId:string;
+    label: string;
+    module: string;
     onChange: (value: any) => void;
     fetchOptions: (query: string) => Promise<any[]>;
     placeholder?: string;
@@ -54,17 +58,24 @@ export default function SearchDropdown({
             try {
                 setLoading(true);
                 const data = await fetchOptions(query);
+                console.log(data, 'fasdlfjahsldfjkhalsdjkf')
                 setOptions(data || []);
                 setOpen(true);
             } finally {
                 setLoading(false);
             }
         }, 400);
-    }, [query]);
+    }, [query,branchId]);
 
     const handleSelect = (item: any) => {
+        console.log(item,'fasdlfjkashldkfjhalskdjf')
         onChange(item);
-        setQuery(item?.[labelKey] || "");
+        if (module === "sale") {
+            setQuery(item?.product?.[labelKey] || "");
+        } else {
+            setQuery(item?.[labelKey] || "");
+        }
+
         setOpen(false);
         setOptions([]);
     };
@@ -78,7 +89,7 @@ export default function SearchDropdown({
     return (
         <div className="relative w-full" ref={wrapperRef as any}>
             {/* input */}
-            <label className = 'mb-2'>{label}</label>
+            <label className='mb-2'>{label}</label>
             <div className="relative">
                 <input
                     type="text"
@@ -117,7 +128,7 @@ export default function SearchDropdown({
                                 onClick={() => handleSelect(item)}
                                 className="px-4 py-2 cursor-pointer hover:bg-blue-50"
                             >
-                                {item?.[labelKey]}
+                                {module === 'sale' ? item?.product?.[labelKey] : item?.[labelKey]}
                             </div>
                         ))}
 
