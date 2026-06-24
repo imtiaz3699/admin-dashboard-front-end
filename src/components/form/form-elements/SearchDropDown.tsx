@@ -9,8 +9,10 @@ export default function SearchDropdown({
     label,
     module,
     branchId,
+    disabled
 }: {
     value: any;
+    disabled?: boolean;
     branchId: string;
     label: string;
     module: string;
@@ -58,7 +60,6 @@ export default function SearchDropdown({
             try {
                 setLoading(true);
                 const data = await fetchOptions(query);
-                console.log(data, 'fasdlfjahsldfjkhalsdjkf')
                 setOptions(data || []);
                 setOpen(true);
             } finally {
@@ -68,9 +69,8 @@ export default function SearchDropdown({
     }, [query, branchId]);
 
     const handleSelect = (item: any) => {
-        console.log(item, 'fasdlfjkashldkfjhalskdjf')
         onChange(item);
-        if (module === "sale") {
+        if ((module === "sale" || module === "transfer")) {
             setQuery(item?.product?.[labelKey] || "");
         } else {
             setQuery(item?.[labelKey] || "");
@@ -93,6 +93,7 @@ export default function SearchDropdown({
             <div className="relative">
                 <input
                     type="text"
+                    disabled={disabled}
                     value={query}
                     onChange={(e) => {
                         setQuery(e.target.value);
@@ -122,14 +123,14 @@ export default function SearchDropdown({
                     )}
 
                     {!loading &&
-                        options.map((item,index) => (
+                        options.map((item, index:number) => (
                             <>
                                 <div
-                                    key={item._id}
+                                    key={item?._id}
                                     onClick={() => handleSelect(item)}
                                     className="px-4 py-2 cursor-pointer hover:bg-blue-50"
                                 >
-                                    {module === 'sale' ? item?.product?.[labelKey] : item?.[labelKey]}
+                                    {(module === 'sale' || module === 'transfer') ? item?.product?.[labelKey] : item?.[labelKey]}
                                 </div>
                                 {/* <p className = 'px-4'>{item[index].quantity}</p> */}
 

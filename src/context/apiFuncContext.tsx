@@ -24,42 +24,42 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { token, user } = useUser();
     const postRequest = async (
-    url: string,
-    data: any,
-    isToken = false,
-    customHeaders = {},
-    formData?: string
-) => {
+        url: string,
+        data: any,
+        isToken = false,
+        customHeaders = {},
+        formData?: string
+    ) => {
 
-    const baseUrl = import.meta.env.VITE_BASE_URL + url;
+        const baseUrl = import.meta.env.VITE_BASE_URL + url;
 
-    try {
+        try {
 
-        const headers = {
-            "Content-Type":
-                formData === "formData"
-                    ? "multipart/form-data"
-                    : "application/json",
+            const headers = {
+                "Content-Type":
+                    formData === "formData"
+                        ? "multipart/form-data"
+                        : "application/json",
 
-            ...(isToken && { Authorization: `Bearer ${token}` }),
+                ...(isToken && { Authorization: `Bearer ${token}` }),
 
-            ...customHeaders,
-        };
+                ...customHeaders,
+            };
 
-        const response = await axios.post(baseUrl, data, {
-            headers,
-        });
+            const response = await axios.post(baseUrl, data, {
+                headers,
+            });
 
-        return response?.data || response;
+            return response?.data || response;
 
-    } catch (error: any) {
+        } catch (error: any) {
 
-        if (error) {
-            throw error;
+            if (error) {
+                throw error;
+            }
+
         }
-
-    }
-};
+    };
     const putRequest = async (url: string, data: any, isToken = false, customHeaders = {}) => {
         const baseUrl = import.meta.env.VITE_BASE_URL + url;
         try {
@@ -77,6 +77,8 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             }
         }
     };
+
+
     const getRequest = async (url: string, id?: string) => {
         const baseUrl = import.meta.env.VITE_BASE_URL + url;
         try {

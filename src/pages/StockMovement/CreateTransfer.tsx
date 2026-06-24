@@ -1,72 +1,35 @@
+import { useFormik } from 'formik';
 import React from 'react'
-import { useApi } from '../../context/apiFuncContext';
+import { useApi } from '../../context/apiFuncContext'
 import { useQuery } from '@tanstack/react-query';
 import Select from '../../components/form/Select';
-import { useFormik } from 'formik';
 import SearchDropdown from '../../components/form/form-elements/SearchDropDown';
-import Button from '../../components/ui/button/Button'
-import * as Yup from "yup";
+import Button from '../../components/ui/button/Button';
+import * as Yup from 'yup';
 import { message } from 'antd';
-function AddSale() {
-    const module = 'sale'
-    const [messageApi, contextHolder] = message.useMessage();
+function CreateTransfer() {
     const { getRequest, postRequest } = useApi();
+    const [messageApi, contextHolder] = message.useMessage();
     const validationSchema = Yup.object({
-        branchId: Yup.string()
-            .required("Branch is required"),
-
-        items: Yup.array()
-            .of(
-                Yup.object({
-                    productId: Yup.string()
-                        .required("Product is required"),
-
-                    quantity: Yup.number()
-                        .required("Quantity is required")
-                        .min(1, "Quantity must be at least 1"),
-
-                    sellingPrice: Yup.number()
-                        .required("Selling price is required")
-                        .min(0, "Selling price cannot be negative"),
-
-                    costPrice: Yup.number()
-                        .required("Cost price is required")
-                        .min(0, "Cost price cannot be negative"),
-
-                    name: Yup.string()
-                        .required("Product name is required"),
-                })
-            )
-            .min(1, "At least one item is required"),
-
-        totalAmount: Yup.number()
-            .required("Total amount is required")
-            .min(0, "Total amount cannot be negative"),
-    });
+        fromBranchId: Yup.string().required("From branch is required."),
+        toBranchId: Yup.string().required("To branch is required."),
+    })
     const formik = useFormik({
         initialValues: {
-            branchId: "",
+            fromBranchId: "",
+            toBranchId: "",
             items: [
-                {
-                    productId: "",
-                    quantity: 0,
-                    sellingPrice: 0,
-                    name: "",
-                    type: "OUT",
-                    costPrice: ""
-                }
-            ],
-            totalAmount: 0,
+                { productId: "", quantity: 0, costPrice: 0, sellingPrice: 0, name: "" }
+            ]
         },
         validationSchema,
-
         onSubmit: async (values) => {
             try {
-                const clearnedItems = values.items.map(({ name, ...rest }) => rest);
-                const payload = { ...values, items: clearnedItems };
-                const res = await postRequest('/api/sale/create-sale', payload, true)
+                const cleardItems = values.items.map(({ name, costPrice, sellingPrice, ...rest }) => rest)
+                const payload = { ...values, items: cleardItems }
+                const res = await postRequest(`/api/transfer/create-transfer`, payload, true);
             } catch (e: any) {
-                console.log(e, 'error')
+                console.log(e, "error")
                 messageApi.error({
                     content: e?.response?.data?.message,
                 });
@@ -81,11 +44,12 @@ function AddSale() {
             console.log(e);
         }
     }
-    const branchesList = useQuery({
-        queryKey: ['branches-list'],
-        queryFn: getBranchesList
-    });
-    const branchOptions = branchesList?.data?.data?.map((branch: any) => {
+    const branchesData = useQuery({
+        queryKey: ['branches-list-2'],
+        queryFn: getBranchesList,
+        refetchOnMount: true
+    })
+    const branchOptions = branchesData?.data?.data?.map((branch: any) => {
         return {
             label: branch?.name,
             value: branch?._id
@@ -93,36 +57,43 @@ function AddSale() {
     })
     const fetchProducts = async (query: string) => {
         try {
-            const res = await getRequest(`/api/product/search/${formik.values.branchId}/${query}`)
+            const res = await getRequest(`/api/product/search/${formik.values.fromBranchId}/${query}`)
             return res;
         } catch (e) {
             console.log(e);
         }
     }
-
-    React.useEffect(() => {
-        const totalAmount = formik.values?.items?.reduce((acc, curr: any) => acc + (curr?.costPrice * curr?.quantity), 0)
-        formik.setFieldValue("totalAmount", totalAmount)
-    }, [formik.values.items])
-    console.log(formik.errors, 'fasdlfjashldfjkhalsdjkh')
+    console.log(formik.values, 'fasdlfjhasldjkfhalskdjh')
     return (
         <>
-            {contextHolder}
-            <form onSubmit={formik.handleSubmit}>
-                <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Sale</h1>
-                <Select
-                    label="Select Branch"
-                    options={branchOptions || []}
-                    value={formik.values.branchId}
-                    onChange={(value) => formik.setFieldValue("branchId", value)}
-                    name='branchId'
-                    required={true}
-                    errors={formik.touched?.branchId && formik.errors?.branchId ? formik.errors?.branchId : ""}
-                />
-                <div className='flex flex-col items-start gap-5'>
+        {contextHolder}
+            <form onSubmit={formik.handleSubmit} >
+                <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Sales</h1>
+                <div className='flex flex-row items-center gap-5'>
+                    <Select
+                        label="Select From Branch"
+                        options={branchOptions || []}
+                        value={formik.values.fromBranchId}
+                        onChange={(value) => formik.setFieldValue("fromBranchId", value)}
+                        name='branchId'
+                        required={true}
+                        errors={formik.touched?.fromBranchId && formik.errors?.fromBranchId ? formik.errors?.fromBranchId : ""}
+                    />
+                    <Select
+                        label="Select To Branch"
+                        options={branchOptions?.filter((branch: any) => branch.value !== formik.values.fromBranchId) || []}
+                        value={formik.values.toBranchId}
+                        onChange={(value) => formik.setFieldValue("toBranchId", value)}
+                        name='branchId'
+                        required={true}
+                        errors={formik.touched?.toBranchId && formik.errors?.toBranchId ? formik.errors?.toBranchId : ""}
+                    />
+                </div>
+                <div className='flex flex-col items-start gap-5 mt-5'>
                     <SearchDropdown
-                        branchId={formik.values.branchId}
-                        module={module}
+                        branchId={formik.values.fromBranchId}
+                        disabled={!formik.values.fromBranchId}
+                        module={"transfer"}
                         label="Select Product"
                         fetchOptions={fetchProducts}
                         value={formik.values.items?.[0]?.productId}
@@ -221,10 +192,10 @@ function AddSale() {
                                     </div>
                                 ))}
                         </div>
-                        <p className=' text-sm font-medium text-gray-700 dark:text-gray-400'> Total:{formik.values.totalAmount}</p>
                     </div>
 
                 </div>
+
 
                 <div className='flex flex-row items-center justify-end gap-5'>
                     <Button type='submit' size='md' variant='primary' >
@@ -234,9 +205,10 @@ function AddSale() {
                         Cancel
                     </Button>
                 </div>
+
             </form>
         </>
     )
 }
 
-export default AddSale
+export default CreateTransfer;
