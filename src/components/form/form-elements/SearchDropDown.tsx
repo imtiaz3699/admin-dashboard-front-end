@@ -11,7 +11,7 @@ export default function SearchDropdown({
     branchId,
 }: {
     value: any;
-    branchId:string;
+    branchId: string;
     label: string;
     module: string;
     onChange: (value: any) => void;
@@ -65,10 +65,10 @@ export default function SearchDropdown({
                 setLoading(false);
             }
         }, 400);
-    }, [query,branchId]);
+    }, [query, branchId]);
 
     const handleSelect = (item: any) => {
-        console.log(item,'fasdlfjkashldkfjhalskdjf')
+        console.log(item, 'fasdlfjkashldkfjhalskdjf')
         onChange(item);
         if (module === "sale") {
             setQuery(item?.product?.[labelKey] || "");
@@ -122,14 +122,18 @@ export default function SearchDropdown({
                     )}
 
                     {!loading &&
-                        options.map((item) => (
-                            <div
-                                key={item._id}
-                                onClick={() => handleSelect(item)}
-                                className="px-4 py-2 cursor-pointer hover:bg-blue-50"
-                            >
-                                {module === 'sale' ? item?.product?.[labelKey] : item?.[labelKey]}
-                            </div>
+                        options.map((item,index) => (
+                            <>
+                                <div
+                                    key={item._id}
+                                    onClick={() => handleSelect(item)}
+                                    className="px-4 py-2 cursor-pointer hover:bg-blue-50"
+                                >
+                                    {module === 'sale' ? item?.product?.[labelKey] : item?.[labelKey]}
+                                </div>
+                                {/* <p className = 'px-4'>{item[index].quantity}</p> */}
+
+                            </>
                         ))}
 
                     {!loading && query && options.length === 0 && (

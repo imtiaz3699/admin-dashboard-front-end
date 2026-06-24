@@ -5,10 +5,44 @@ import Select from '../../components/form/Select';
 import { useFormik } from 'formik';
 import SearchDropdown from '../../components/form/form-elements/SearchDropDown';
 import Button from '../../components/ui/button/Button'
+import * as Yup from "yup";
+import { message } from 'antd';
 function AddSale() {
     const module = 'sale'
+    const [messageApi, contextHolder] = message.useMessage();
     const { getRequest, postRequest } = useApi();
+    const validationSchema = Yup.object({
+        branchId: Yup.string()
+            .required("Branch is required"),
 
+        items: Yup.array()
+            .of(
+                Yup.object({
+                    productId: Yup.string()
+                        .required("Product is required"),
+
+                    quantity: Yup.number()
+                        .required("Quantity is required")
+                        .min(1, "Quantity must be at least 1"),
+
+                    sellingPrice: Yup.number()
+                        .required("Selling price is required")
+                        .min(0, "Selling price cannot be negative"),
+
+                    costPrice: Yup.number()
+                        .required("Cost price is required")
+                        .min(0, "Cost price cannot be negative"),
+
+                    name: Yup.string()
+                        .required("Product name is required"),
+                })
+            )
+            .min(1, "At least one item is required"),
+
+        totalAmount: Yup.number()
+            .required("Total amount is required")
+            .min(0, "Total amount cannot be negative"),
+    });
     const formik = useFormik({
         initialValues: {
             branchId: "",
@@ -17,19 +51,24 @@ function AddSale() {
                     productId: "",
                     quantity: 0,
                     sellingPrice: 0,
-                    name: ""
+                    name: "",
+                    type: "OUT",
+                    costPrice: ""
                 }
             ],
             totalAmount: 0,
         },
+        validationSchema,
         onSubmit: async (values) => {
             try {
                 const clearnedItems = values.items.map(({ name, ...rest }) => rest);
                 const payload = { ...values, items: clearnedItems };
                 const res = await postRequest('/api/sale/create-sale', payload, true)
-                console.log(res, 'fasdlfkjhasldjfhlasjd')
-            } catch (e) {
+            } catch (e: any) {
                 console.log(e, 'error')
+                messageApi.error({
+                    content: e?.response?.data?.message,
+                });
             }
         }
     })
@@ -64,128 +103,138 @@ function AddSale() {
         const totalAmount = formik.values?.items?.reduce((acc, curr: any) => acc + (curr?.costPrice * curr?.quantity), 0)
         formik.setFieldValue("totalAmount", totalAmount)
     }, [formik.values.items])
-    console.log(formik.values.items, 'faldjfhlasjdfhlasList')
+    console.log(formik.errors, 'fasdlfjashldfjkhalsdjkh')
     return (
-        <form onSubmit={formik.handleSubmit}>
-            <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Sale</h1>
-            <Select
-                label="Select Branch"
-                options={branchOptions || []}
-                value={formik.values.branchId}
-                onChange={(value) => formik.setFieldValue("branchId", value)}
-                name='branchId'
-                required={true}
-                errors={formik.touched?.branchId && formik.errors?.branchId ? formik.errors?.branchId : ""}
-            />
-            <div className='flex flex-col items-start gap-5'>
-                <SearchDropdown
-                    branchId={formik.values.branchId}
-                    module={module}
-                    label="Select Product"
-                    fetchOptions={fetchProducts}
-                    value={formik.values.items?.[0]?.productId}
-                    onChange={(selected) => {
-                        const currentItems = formik.values.items || [];
-
-                        // remove empty objects (IMPORTANT FIX)
-                        const cleanedItems = currentItems.filter(
-                            (i) => i.productId
-                        );
-
-                        // prevent duplicate
-                        const exists = cleanedItems.some(
-                            (i) => i.productId === selected?.product?._id
-                        );
-
-                        if (exists) return;
-
-                        formik.setFieldValue("items", [
-                            ...cleanedItems,
-                            {
-                                productId: selected?.product?._id,
-                                quantity: 0,
-                                costPrice: selected?.product?.costPrice,
-                                sellingPrice: selected?.product?.sellingPrice,
-                                name: selected?.product?.name
-                            },
-                        ]);
-                    }}
-                    placeholder="Search product"
+        <>
+            {contextHolder}
+            <form onSubmit={formik.handleSubmit}>
+                <h1 className='flex cursor-pointer text-nowrap select-none items-center gap-3 text-2xl mb-5 font-medium ${disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400'>Add Sale</h1>
+                <Select
+                    label="Select Branch"
+                    options={branchOptions || []}
+                    value={formik.values.branchId}
+                    onChange={(value) => formik.setFieldValue("branchId", value)}
+                    name='branchId'
+                    required={true}
+                    errors={formik.touched?.branchId && formik.errors?.branchId ? formik.errors?.branchId : ""}
                 />
-                <div className='flex flex-row items-center gap-2'>
-                    {formik.values?.items?.length > 0 &&
-                        formik.values.items.map((item, index) => (
-                            <div
-                                key={index}
-                                className="flex flex-col gap-2 p-3 border rounded-lg mb-3"
-                            >
-                                {/* Product Name */}
-                                <div className="text-sm font-semibold text-gray-700">
-                                    {item?.name || "Product"}
-                                </div>
+                <div className='flex flex-col items-start gap-5'>
+                    <SearchDropdown
+                        branchId={formik.values.branchId}
+                        module={module}
+                        label="Select Product"
+                        fetchOptions={fetchProducts}
+                        value={formik.values.items?.[0]?.productId}
+                        onChange={(selected) => {
+                            const currentItems = formik.values.items || [];
 
-                                {/* Quantity Controls */}
-                                <div className="flex items-center gap-3">
+                            // remove empty objects (IMPORTANT FIX)
+                            const cleanedItems = currentItems.filter(
+                                (i) => i.productId
+                            );
 
-                                    {/* Minus Button */}
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const current = formik.values.items[index].quantity || 0;
-                                            if (current <= 0) return;
+                            // prevent duplicate
+                            const exists = cleanedItems.some(
+                                (i) => i.productId === selected?.product?._id
+                            );
 
-                                            formik.setFieldValue(
-                                                `items.${index}.quantity`,
-                                                current - 1
-                                            );
-                                        }}
-                                        className="px-3 py-1 bg-gray-200 rounded"
+                            if (exists) return;
+
+                            formik.setFieldValue("items", [
+                                ...cleanedItems,
+                                {
+                                    productId: selected?.product?._id,
+                                    quantity: 1,
+                                    costPrice: selected?.product?.costPrice,
+                                    sellingPrice: selected?.product?.sellingPrice,
+                                    name: selected?.product?.name,
+
+                                },
+                            ]);
+                        }}
+                        placeholder="Search product"
+                    />
+
+                    <div className='flex justify-between w-full gap-2'>
+                        <div className='flex flex-row items-center gap-2'>
+                            {formik.values?.items?.length > 0 &&
+                                formik.values.items.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex flex-col gap-2 p-3 border rounded-lg mb-3"
                                     >
-                                        -
-                                    </button>
+                                        {/* Product Name */}
+                                        <div className="text-sm font-semibold text-gray-700">
+                                            {item?.name || "Product"}
+                                        </div>
 
-                                    {/* Quantity Input */}
-                                    <input
-                                        type="number"
-                                        value={item?.quantity}
-                                        onChange={(e) =>
-                                            formik.setFieldValue(
-                                                `items.${index}.quantity`,
-                                                Number(e.target.value)
-                                            )
-                                        }
-                                        className="w-20 text-center border rounded"
-                                    />
+                                        {/* Quantity Controls */}
+                                        <div className="flex items-center gap-3">
 
-                                    {/* Plus Button */}
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const current = formik.values.items[index].quantity || 0;
+                                            {/* Minus Button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const current = formik.values.items[index].quantity || 0;
+                                                    if (current <= 0) return;
 
-                                            formik.setFieldValue(
-                                                `items.${index}.quantity`,
-                                                current + 1
-                                            );
-                                        }}
-                                        className="px-3 py-1 bg-gray-200 rounded"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                                                    formik.setFieldValue(
+                                                        `items.${index}.quantity`,
+                                                        current - 1
+                                                    );
+                                                }}
+                                                className="px-3 py-1 bg-gray-200 rounded"
+                                            >
+                                                -
+                                            </button>
+
+                                            {/* Quantity Input */}
+                                            <input
+                                                type="number"
+                                                value={item?.quantity}
+                                                onChange={(e) =>
+                                                    formik.setFieldValue(
+                                                        `items.${index}.quantity`,
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                className="w-20 text-center border rounded"
+                                            />
+
+                                            {/* Plus Button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const current = formik.values.items[index].quantity || 0;
+
+                                                    formik.setFieldValue(
+                                                        `items.${index}.quantity`,
+                                                        current + 1
+                                                    );
+                                                }}
+                                                className="px-3 py-1 bg-gray-200 rounded"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                        <p className=' text-sm font-medium text-gray-700 dark:text-gray-400'> Total:{formik.values.totalAmount}</p>
+                    </div>
+
                 </div>
-            </div>
-            <div className='flex flex-row items-center justify-end gap-5'>
-                <Button type='submit' size='md' variant='primary' >
-                    {"Submit"}
-                </Button>
-                <Button size='md' variant='outline' >
-                    Cancel
-                </Button>
-            </div>
-        </form>
+
+                <div className='flex flex-row items-center justify-end gap-5'>
+                    <Button type='submit' size='md' variant='primary' >
+                        {"Submit"}
+                    </Button>
+                    <Button size='md' variant='outline' >
+                        Cancel
+                    </Button>
+                </div>
+            </form>
+        </>
     )
 }
 

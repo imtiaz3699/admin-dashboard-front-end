@@ -17,26 +17,24 @@ function Pagination({
     };
 
     const renderPages = () => {
-        const pages = [];
-
-        for (let i = 1; i <= totalPages; i++) {
-            pages.push(
+        return Array.from({ length: totalPages }, (_, index) => {
+            const page = index + 1;
+            console.log(typeof(currentPage),page,'CurrentPageIndex')
+            return (
                 <button
-                    key={i}
-                    onClick={() => handlePageChange(i)}
-                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold inset-ring inset-ring-gray-700 focus:z-20 focus:outline-offset-0
-                        
-                        ${currentPage === i
+                    key={page}
+                    type="button"
+                    onClick={() => handlePageChange(page)}
+                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-none
+                    ${Number(currentPage) === page
                             ? "z-10 bg-indigo-500 text-white"
                             : "text-gray-200 hover:bg-white/5"
                         }`}
                 >
-                    {i}
+                    {page}
                 </button>
             );
-        }
-
-        return pages;
+        });
     };
 
     return (

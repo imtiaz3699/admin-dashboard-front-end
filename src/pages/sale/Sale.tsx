@@ -1,14 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import React from 'react'
+import React, { useState } from 'react'
 import { useApi } from '../../context/apiFuncContext';
 import SalesTable from '../Tables/SalesTable';
 
 function Sale() {
     const { getRequest } = useApi()
-
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+    });
     const fetchData = async () => {
         try {
-            const res = await getRequest(`/api/sale/get-all-sales`);
+            const res = await getRequest(`/api/sale/get-all-sales?page=${pagination.page}&limit=${pagination.limit}`);
             console.log(res);
             return res?.data;
         } catch (e) {
@@ -16,7 +19,7 @@ function Sale() {
         }
     }
     const salesData = useQuery({
-        queryKey: ['sales'],
+        queryKey: ['sales', pagination.page, pagination.limit],
         queryFn: fetchData,
         refetchOnMount: true
     })
@@ -25,9 +28,14 @@ function Sale() {
         <div>
             <SalesTable data={salesData?.data}
                 handleDelete={() => { }}
-                handlePageChange={(str: string) => { console.log(str) }}
-                page={1}
-                setPage={() => { }} />
+                page={pagination.page}
+                setPage={(newPage) =>
+                    setPagination((prev: any) => ({
+                        ...prev,
+                        page: newPage,
+                    }))
+                }
+            />
         </div>
     )
 }
