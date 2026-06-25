@@ -7,9 +7,11 @@ import SearchDropdown from '../../components/form/form-elements/SearchDropDown';
 import Button from '../../components/ui/button/Button';
 import * as Yup from 'yup';
 import { message } from 'antd';
+import {useNavigate} from 'react-router'
 function CreateTransfer() {
     const { getRequest, postRequest } = useApi();
     const [messageApi, contextHolder] = message.useMessage();
+    const navigate = useNavigate();
     const validationSchema = Yup.object({
         fromBranchId: Yup.string().required("From branch is required."),
         toBranchId: Yup.string().required("To branch is required."),
@@ -28,6 +30,9 @@ function CreateTransfer() {
                 const cleardItems = values.items.map(({ name, costPrice, sellingPrice, ...rest }) => rest)
                 const payload = { ...values, items: cleardItems }
                 const res = await postRequest(`/api/transfer/create-transfer`, payload, true);
+                if(res) {
+                    navigate('/dashboard/stock-transfer')
+                }
             } catch (e: any) {
                 console.log(e, "error")
                 messageApi.error({

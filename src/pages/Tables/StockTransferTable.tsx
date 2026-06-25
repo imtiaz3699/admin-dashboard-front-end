@@ -5,27 +5,33 @@ import CompopnentCard from '../../components/common/ComponentCard'
 import { useNavigate } from 'react-router'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../components/ui/table";
 import Pagination from '../../components/common/Pagination';
-import { MoreDotIcon } from '../../icons'
+import { MoreDotIcon, Warning } from '../../icons'
 import { Dropdown } from "../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../components/ui/dropdown/DropdownItem";
 import { useApi } from '../../context/apiFuncContext'
 import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../../context/userContext'
 import { Modal } from 'antd'
-
+import ViewProduct from '../StockMovement/ViewProduct'
+import Button from '../../components/ui/button/Button'
+import toast, { Toaster } from 'react-hot-toast';
 function StockTransferTable({ data, setPage, page }:
     { data: any, page: number, setPage: React.Dispatch<React.SetStateAction<number>> }) {
     const [selectedTransfer, setSelectedTransfer] = useState('')
     const [isModalOpen, setIsModalOpen] = useState("");
+    const [isModalTwoOpen, setIsModalTwoOpen] = useState("");
+    const [isViewModalOpen, setIsViewModalOpen] = useState('');
     const { user } = useUser();
     const queryClient = useQueryClient()
     const navigate = useNavigate();
-    const { deleteRequest } = useApi();
+    const { deleteRequest, putRequest } = useApi();
     const tableHeadStyles = "px-5 py-3 font-bold text-gray-500 text-start text-theme-xs dark:text-gray-400"
     const currentPage = data?.page ?? 1;
     const limit = data?.limit;
     const total = data?.total;
-    const totalPages = Math.ceil(data?.totalRecords / limit);;
+    const totalPages = Math.ceil(data?.totalRecords / limit);
+
+
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
@@ -33,20 +39,50 @@ function StockTransferTable({ data, setPage, page }:
     const handleDeleteTransfer = async (id: string) => {
         try {
             const res = await deleteRequest(`/api/transfer/delete-transfer/${id}`);
-            console.log(res, 'deltedtransferasdfad')
-            queryClient.invalidateQueries({
-                queryKey: ['transfer']
-            })
-        } catch (e) {
-            console.log(e,);
+            if (res) {
+                queryClient.invalidateQueries({
+                    queryKey: ['transfer']
+                })
+                setIsModalOpen("");
+            }
+
+        } catch (e: any) {
+            console.log(e, 'aldjfalsdjkfhlaskdjfhlaksdj');
+
         }
     }
     const handleOk = async () => {
-
+        await handleDeleteTransfer(isModalOpen);
+    }
+    const handleReject = async () => {
+        try {
+            const res = await putRequest(`/api/transfer/reject-transfer/${isModalTwoOpen || isViewModalOpen}`, {}, true);
+            if (res) {
+                queryClient.invalidateQueries({
+                    queryKey: ['transfer']
+                })
+                setIsModalTwoOpen("");
+                setIsViewModalOpen("");
+            }
+        } catch (e: any) {
+            toast(e?.response?.data?.message);
+        }
+    }
+    const handleAcceptTransfer = async () => {
+        try {
+            const res = await putRequest(`/api/transfer/approve-transfer/${isViewModalOpen}`,{},true) 
+            console.log(res,'responseoftheapi')
+        } catch (e:any) {
+            toast(e?.response?.data?.message)
+            console.log(e)
+        }
     }
     console.log(user, 'fasdlfjhasdUser')
     return (
         <>
+            <Toaster
+
+                position="bottom-right" />
             <PageMeta
                 title="Stock Transfer"
                 description='Transfer Description'
@@ -115,7 +151,7 @@ function StockTransferTable({ data, setPage, page }:
                                                 {transfer?.items?.length}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                <div className={`px-1 py-1 ${transfer?.status === "PENDING" ? "bg-yellow-100 text-yellow-600" : transfer?.status === "COMPLETED" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}  rounded-full text-black text-center font-medium`}>
+                                                <div className={`px-1 py-1 ${transfer?.status === "PENDING" ? "bg-yellow-100 text-yellow-600" : transfer?.status === "APPROVED" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}  rounded-full text-black text-center font-medium`}>
                                                     {transfer?.status}
                                                 </div>
                                             </TableCell>
@@ -130,13 +166,18 @@ function StockTransferTable({ data, setPage, page }:
                                                     onClose={() => setSelectedTransfer("")}
                                                 >
                                                     <DropdownItem
+                                                        onItemClick={() => { setIsViewModalOpen(transfer?._id); setSelectedTransfer('') }}
+                                                    >
+                                                        <div className='text-gray-'>View Transfer</div>
+                                                    </DropdownItem>
+                                                    <DropdownItem
                                                         onItemClick={() => { navigate(`/dashboard/update-branch/${transfer?._id}`) }}
                                                     >
                                                         <div className='text-gray-'> Edit</div>
                                                     </DropdownItem>
                                                     {
                                                         (transfer?.status !== "PENDING" || transfer?.createdBy !== user?._id) && <DropdownItem
-                                                        // onItemClick={() => { navigate(`/dashboard/update-branch/${transfer?._id}`) }}
+                                                            onItemClick={() => { setIsModalTwoOpen(transfer?._id); setSelectedTransfer('') }}
                                                         >
                                                             <div className='text-gray-'>Reject</div>
                                                         </DropdownItem>
@@ -180,9 +221,52 @@ function StockTransferTable({ data, setPage, page }:
                     </>
                 )}
             >
-                <div className=''>
-                
+                <div className='flex flex-col items-center justify-center'>
+                    <Warning className='text-[100px] text-orange-400' />
+                    <p className='font-bold text-[22px] text-center'>Are you sure you want to delete this transfer?</p>
+                    <p className='font-medium text-[18px] text-center'>This operation cannot be undone?</p>
                 </div>
+            </Modal>
+            <Modal
+                open={isModalTwoOpen !== ""}
+                title="Reject Transfer"
+                onOk={handleReject}
+                onCancel={() => { setIsModalTwoOpen(""); setSelectedTransfer("") }}
+                centered
+                footer={(_, { OkBtn, CancelBtn }) => (
+                    <>
+                        <CancelBtn />
+                        <OkBtn />
+                    </>
+                )}
+            >
+                <div className='flex flex-col items-center justify-center'>
+                    <Warning className='text-[100px] text-orange-400' />
+                    <p className='font-bold text-[22px] text-center'>Are you sure you want to reject this transfer?</p>
+                    <p className='font-medium text-[18px] text-center'>This operation cannot be undone?</p>
+                </div>
+            </Modal>
+
+            <Modal
+                open={isViewModalOpen !== ""}
+                title="Product View"
+                onOk={handleAcceptTransfer}
+                onCancel={() => { setIsViewModalOpen(""); setSelectedTransfer("") }}
+                centered
+                footer={() => (
+                    <div className='flex flex-row items-center gap-5'>
+
+                        <Button onClick={() => handleReject()} variant="outline">
+                            Reject
+                        </Button>
+                        <Button onClick={()=> handleAcceptTransfer()} variant="primary">
+                            Accept
+                        </Button>
+
+                    </div>
+                )}
+            >
+                <ViewProduct transferId={isViewModalOpen} />
             </Modal>
         </>
     )
