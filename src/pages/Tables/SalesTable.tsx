@@ -22,7 +22,7 @@ function SalesTable({ data, handleDelete, setPage, page }:
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
-    console.log(limit, totalPages,currentPage, 'faldfjalsdfhlaskdfhalskdjh')
+    console.log(limit, totalPages, currentPage, 'faldfjalsdfhlaskdfhalskdjh')
     return (
         <>
             <PageMeta

@@ -59,6 +59,8 @@ import { IoGitBranchOutline as Branch } from "react-icons/io5";
 import { BiPurchaseTagAlt as PurchaseOrder } from "react-icons/bi";
 import { RiErrorWarningLine as Warning } from "react-icons/ri";
 import { FcSalesPerformance as Sales } from "react-icons/fc";
+import { HiAdjustmentsHorizontal as StockAdjustment } from "react-icons/hi2";
+
 
 export {
   Stock,
@@ -121,5 +123,6 @@ export {
   Manager,
   Tick,
   Warning,
-  Sales
+  Sales,
+  StockAdjustment
 };

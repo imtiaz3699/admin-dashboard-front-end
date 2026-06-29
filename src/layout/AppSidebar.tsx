@@ -15,7 +15,8 @@ import {
   Stock,
   Branch,
   PurchaseOrder,
-  Sales
+  Sales,
+  StockAdjustment
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -73,6 +74,11 @@ const navItems: NavItem[] = [
     icon: <Stock />,
     name: "Stock",
     path: "/dashboard/stock",
+  },
+  {
+    icon: <StockAdjustment />,
+    name: "Stock Adjustment",
+    path: "/dashboard/stock-adjustment",
   },
   {
     icon: <Sales />,

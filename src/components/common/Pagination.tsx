@@ -19,7 +19,7 @@ function Pagination({
     const renderPages = () => {
         return Array.from({ length: totalPages }, (_, index) => {
             const page = index + 1;
-            console.log(typeof(currentPage),page,'CurrentPageIndex')
+            console.log(typeof (currentPage), page, 'CurrentPageIndex')
             return (
                 <button
                     key={page}

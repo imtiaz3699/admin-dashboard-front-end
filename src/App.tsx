@@ -41,6 +41,8 @@ import Sale from "./pages/sale/Sale";
 import AddSale from "./pages/sale/AddSale";
 import StockTransfer from "./pages/StockMovement/StockTransfer";
 import CreateTransfer from "./pages/StockMovement/CreateTransfer";
+import StockAdjustment from "./pages/StockAdjustment/StockAdjustment";
+import AddAdjustment from "./pages/StockAdjustment/AddAdjustment";
 export default function App() {
   return (
     <>
@@ -82,6 +84,9 @@ export default function App() {
               <Route path="/dashboard/stock-out" element={<StockOut stock="OUT" />} />
               <Route path="/dashboard/stock-transfer" element={<StockTransfer />} />
               <Route path="/dashboard/create-transfer" element={<CreateTransfer />} />
+              //Stock adjustment
+              <Route path="/dashboard/stock-adjustment" element={<StockAdjustment />} />
+              <Route path="/dashboard/add-adjustment" element={<AddAdjustment />} />
 
               {/* //supplier */}
               <Route path="/dashboard/supplier" element={<Supplier />} />

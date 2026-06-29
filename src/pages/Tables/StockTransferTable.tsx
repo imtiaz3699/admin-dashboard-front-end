@@ -70,9 +70,14 @@ function StockTransferTable({ data, setPage, page }:
     }
     const handleAcceptTransfer = async () => {
         try {
-            const res = await putRequest(`/api/transfer/approve-transfer/${isViewModalOpen}`,{},true) 
-            console.log(res,'responseoftheapi')
-        } catch (e:any) {
+            const res = await putRequest(`/api/transfer/approve-transfer/${isViewModalOpen}`, {}, true)
+            if (res) {
+                queryClient.invalidateQueries({
+                    queryKey: ['transfer']
+                })
+                setIsViewModalOpen("");
+            }
+        } catch (e: any) {
             toast(e?.response?.data?.message)
             console.log(e)
         }
@@ -259,7 +264,7 @@ function StockTransferTable({ data, setPage, page }:
                         <Button onClick={() => handleReject()} variant="outline">
                             Reject
                         </Button>
-                        <Button onClick={()=> handleAcceptTransfer()} variant="primary">
+                        <Button onClick={() => handleAcceptTransfer()} variant="primary">
                             Accept
                         </Button>
 
